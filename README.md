@@ -14,27 +14,27 @@ Sistema de autocompletado con estructura de datos Trie e IA generativa especiali
 
 ### 1. Clona el repositorio
 
-git remote add origin https://github.com/Jd-GT/EncicloDev.git
+`git remote add origin https://github.com/Jd-GT/EncicloDev.git`
 
 
 
 ### 2. Crea un entorno virtual
 
-python -m venv venv
+`python -m venv venv`
 
 **En Windows:**
-venv\Scripts\activate
+`venv\Scripts\activate`
 
 
 
 **En macOS/Linux:**
-source venv/bin/activate
+`source venv/bin/activate`
 
 
 
 ### 3. Instala las dependencias
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 
 
@@ -42,16 +42,16 @@ pip install -r requirements.txt
 
 Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
 
-GEMINI_API_KEY=tu-api-key-aqui
+`GEMINI_API_KEY=tu-api-key-aqui`
 
 
-**Obtén tu API key gratis en:** https://aistudio.google.com/apikey
+**Obtén tu API key gratis en:** `https://aistudio.google.com/apikey`
 
 ## 💻 Uso
 
 ### Ejecutar la aplicación
 
-python app.py
+`python app.py`
 
 
-Abre tu navegador en: `http://127.0.0.1:5000`
+Abre tu navegador en: `http://127.0.0.1:5000`  
