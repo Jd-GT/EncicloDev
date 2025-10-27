@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EncicloDev</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c9a86a 0%, #8b6f47 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #faf8f3;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #8b6f47;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #6b5444;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: 2px solid #d4c4a8;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        
+        #searchInput:focus {
+            border-color: #a0826d;
+            box-shadow: 0 0 0 3px rgba(160, 130, 109, 0.1);
+        }
+        
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #faf8f3;
+            border: 2px solid #d4c4a8;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e8dcc4;
+            color: #4a3f35;
+        }
+        
+        .suggestion-item:hover {
+            background: #f0e8d8;
+            color: #8b6f47;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: #a0826d;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #8b6f47;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(160, 130, 109, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #9ca986;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7d8471;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(156, 169, 134, 0.3);
+        }
+        
+        .ai-description {
+            background: linear-gradient(135deg, #c9a86a 0%, #a0826d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .ai-description h4 {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .ai-description p {
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .ai-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: normal;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #stats {
+            background: #f0e8d8;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            margin-bottom: 20px;
+        }
+        
+        #stats h3 {
+            color: #8b6f47;
+            margin-bottom: 15px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #d4c4a8;
+            color: #4a3f35;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .badge {
+            background: #a0826d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #9ca986;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .info-box {
+            background: #f0e8d8;
+            border-left: 4px solid #a0826d;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #4a3f35;
+        }
+
+        /* ========== MODAL STYLES ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            animation: fadeInOverlay 0.3s;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #faf8f3;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            z-index: 9999;
+            max-width: 450px;
+            width: 90%;
+            animation: modalSlideIn 0.3s;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding-bottom: 5px 5px;
+            border-bottom: 2px solid #d4c4a8;
+        }
+
+        .modal-header h2 {
+            color: #8b6f47;
+            font-size: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+            <!--Modificar esto para la X bugeada -->
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 5px;
+            color: #8b6f47;
+            cursor: pointer;
+            padding: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            width: 3px;
+            height: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #f0e8d8;
+            transform: rotate(90000000deg);
+                        
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-body label {
+            display: block;
+            color: #6b5444;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d4c4a8;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #a0826d;
+            box-shadow: 0 0 0 3px rgba(160, 130, 109, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-cancel {
+            background: #e8dcc4;
+            color: #6b5444;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #d4c4a8;
+        }
+
+        .modal-btn-confirm {
+            background: #9ca986;
+            color: white;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #7d8471;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(156, 169, 134, 0.3);
+        }
+
+        .modal-hint {
+            font-size: 12px;
+            color: #8b6f47;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 EncicloDev</h1>
+        <p class="subtitle">Estructura de Datos: Trie (Árbol de Prefijos)</p>
+        
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Escribe para buscar... (ej: 'pri', 'doc', 'git')"
+                autocomplete="off"
+            >
+            <div id="suggestions"></div>
+        </div>
+        
+        <div id="aiDescription" class="ai-description"></div>
+        
+        <div class="buttons">
+            <button class="btn-primary" onclick="showStats()">📊 Historial</button>
+            <button class="btn-secondary" onclick="openAddWordModal()">➕ Agregar Palabra</button>
+        </div>
+        
+        <div id="stats"></div>
+        <div id="message" class="message"></div>
+        
+        <div class="info-box">
+            <strong>💡 Cómo funciona:</strong> El sistema usa un Trie para buscar palabras eficientemente. Escribe al menos 1 carácter y verás sugerencias instantáneas. Las palabras más usadas aparecen primero. Al seleccionar una palabra, <strong>la IA genera automáticamente una descripción especializada en programación</strong> con ejemplos prácticos.
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeAddWordModal()"></div>
+
+    <!-- Modal Agregar Palabra -->
+    <div class="modal" id="addWordModal">
+        <div class="modal-header">
+            <h2> Agregar Nueva Palabra</h2>
+            <button class="close-modal" onclick="closeAddWordModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <label for="newWordInput">Término técnico o palabra clave</label>
+            <input 
+                type="text" 
+                id="newWordInput" 
+                class="modal-input" 
+                placeholder="Ejemplo: kubernetes, async, lambda..."
+                maxlength="50"
+            >
+            <p class="modal-hint">💡 Agrega términos de programación para expandir el diccionario</p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" onclick="closeAddWordModal()">Cancelar</button>
+            <button class="modal-btn modal-btn-confirm" onclick="confirmAddWord()">Agregar</button>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        const statsDiv = document.getElementById('stats');
+        const messageDiv = document.getElementById('message');
+        const aiDescriptionDiv = document.getElementById('aiDescription');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const addWordModal = document.getElementById('addWordModal');
+        const newWordInput = document.getElementById('newWordInput');
+        
+        // Autocompletar mientras escribe
+        searchInput.addEventListener('input', async function() {
+            const prefix = this.value;
+            
+            if (prefix.length < 1) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            const response = await fetch('/autocomplete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prefix: prefix})
+            });
+            
+            const data = await response.json();
+            displaySuggestions(data.suggestions);
+        });
+        
+        function displaySuggestions(suggestions) {
+            if (suggestions.length === 0) {
+                suggestionsDiv.innerHTML = '<div class="suggestion-item">No se encontraron sugerencias</div>';
+                suggestionsDiv.style.display = 'block';
+                return;
+            }
+            
+            suggestionsDiv.innerHTML = suggestions.map(word => 
+                `<div class="suggestion-item" onclick="selectWord('${word}')">${word}</div>`
+            ).join('');
+            
+            suggestionsDiv.style.display = 'block';
+        }
+        
+        async function selectWord(word) {
+            searchInput.value = word;
+            suggestionsDiv.style.display = 'none';
+            
+            // Registrar selección
+            await fetch('/select', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({word: word})
+            });
+            
+            // Generar descripción con IA
+            await generateDescription(word);
+        }
+        
+        async function generateDescription(word) {
+            // Mostrar loading
+            aiDescriptionDiv.innerHTML = `
+                <h4>
+                    🤖 Generando descripción con IA
+                    <span class="loading"></span>
+                </h4>
+            `;
+            aiDescriptionDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/generate-description', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({word: word})
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    aiDescriptionDiv.innerHTML = `
+                        <h4>
+                            🤖 Descripción de "${data.word}"
+                            <span class="ai-badge">${data.generated_by}</span>
+                        </h4>
+                        <p>${data.description}</p>
+                    `;
+                } else {
+                    aiDescriptionDiv.innerHTML = `
+                        <h4>❌ Error</h4>
+                        <p>No se pudo generar la descripción: ${data.error}</p>
+                    `;
+                }
+            } catch (error) {
+                aiDescriptionDiv.innerHTML = `
+                    <h4>❌ Error de conexión</h4>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function showStats() {
+            const response = await fetch('/stats');
+            const data = await response.json();
+            
+            if (data.top_words.length === 0) {
+                statsDiv.innerHTML = '<p>Aún no hay estadísticas. Comienza a buscar palabras.</p>';
+            } else {
+                statsDiv.innerHTML = `
+                    <h3>📈 Top 10 Palabras Más Buscadas</h3>
+                    ${data.top_words.map(([word, count], index) => `
+                        <div class="stat-item">
+                            <span><strong>${index + 1}.</strong> ${word}</span>
+                            <span class="badge">${count} búsquedas</span>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            statsDiv.style.display = statsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // ========== FUNCIONES DEL MODAL ==========
+        function openAddWordModal() {
+            modalOverlay.style.display = 'block';
+            addWordModal.style.display = 'block';
+            newWordInput.value = '';
+            newWordInput.focus();
+        }
+
+        function closeAddWordModal() {
+            modalOverlay.style.display = 'none';
+            addWordModal.style.display = 'none';
+        }
+
+        async function confirmAddWord() {
+            const word = newWordInput.value.trim();
+            
+            if (!word) {
+                showMessage('⚠️ Por favor ingresa una palabra válida', 'success');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/add', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({word: word})
+                });
+                
+                const data = await response.json();
+                
+                closeAddWordModal();
+                showMessage(`✅ ${data.message}`, 'success');
+                
+            } catch (error) {
+                showMessage('❌ Error al agregar palabra', 'success');
+            }
+        }
+
+        // Permitir Enter para confirmar en el modal
+        newWordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmAddWord();
+            }
+        });
+
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && addWordModal.style.display === 'block') {
+                closeAddWordModal();
+            }
+        });
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Cerrar sugerencias al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (e.target !== searchInput && e.target !== suggestionsDiv) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
