@@ -47,7 +47,7 @@ Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
 
 **Obtén tu API key gratis en:** `https://aistudio.google.com/apikey`
 
-## 💻 Uso
+##  Uso
 
 ### Ejecutar la aplicación
 
